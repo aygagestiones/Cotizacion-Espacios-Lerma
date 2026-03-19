@@ -6,6 +6,7 @@
     <title>Cotización Interactiva - AYGA Asesoría y Gestión Administrativa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {
             font-family: 'Montserrat', sans-serif;
@@ -554,6 +555,53 @@
             font-weight: 500;
         }
 
+        /* Estilos para PDF */
+        @media print {
+            .chatbot-container,
+            .btn-gold,
+            footer {
+                display: none !important;
+            }
+            
+            body {
+                background: white;
+            }
+        }
+
+        /* Loader para PDF */
+        .pdf-loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            text-align: center;
+        }
+
+        .pdf-loader.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--dorado-metalico);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .section-title {
@@ -588,6 +636,12 @@
     </style>
 </head>
 <body>
+    <!-- Loader PDF -->
+    <div class="pdf-loader" id="pdfLoader">
+        <div class="spinner"></div>
+        <p style="color: var(--azul-profundo); font-weight: 600;">Generando PDF...</p>
+    </div>
+
     <!-- Header -->
     <header class="sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
@@ -607,311 +661,428 @@
                     </svg>
                     <span class="text-sm font-semibold">222 524 9941</span>
                 </div>
-                <button class="btn-gold px-6 py-2 rounded-lg text-sm font-semibold" onclick="downloadPDF()">
+                <button class="btn-gold px-6 py-2 rounded-lg text-sm font-semibold" onclick="generatePDF()">
                     📥 Descargar PDF
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero-section py-20 px-4 relative">
-        <div class="max-w-4xl mx-auto text-center relative z-10">
-            <h2 class="text-5xl md:text-6xl font-bold mb-4 animate-fade-in-down">
-                Estrategia de Regularización y Gestión
-            </h2>
-            <h3 class="text-2xl md:text-3xl mb-8 text-yellow-300 animate-fade-in-up">
-                Proyecto Sanctorum
-            </h3>
-            <p class="text-xl text-gray-200 mb-8 animate-fade-in-up">
-                Preparado exclusivamente para <span class="font-bold text-yellow-300">Jose Carrillo</span> - <span class="font-bold">Espacios Lerma SA de CV</span>
-            </p>
-            <button class="btn-gold px-8 py-3 rounded-lg text-lg font-bold btn-gold-glow" onclick="document.getElementById('auditoria').scrollIntoView({behavior: 'smooth'})">
-                Explorar Propuesta ↓
-            </button>
-        </div>
-    </section>
+    <!-- Contenido para PDF -->
+    <div id="pdfContent">
+        <!-- Hero Section -->
+        <section class="hero-section py-20 px-4 relative">
+            <div class="max-w-4xl mx-auto text-center relative z-10">
+                <h2 class="text-5xl md:text-6xl font-bold mb-4 animate-fade-in-down">
+                    Estrategia de Regularización y Gestión
+                </h2>
+                <h3 class="text-2xl md:text-3xl mb-8 text-yellow-300 animate-fade-in-up">
+                    Proyecto Sanctorum
+                </h3>
+                <p class="text-xl text-gray-200 mb-8 animate-fade-in-up">
+                    Preparado exclusivamente para <span class="font-bold text-yellow-300">Jose Carrillo</span> - <span class="font-bold">Espacios Lerma SA de CV</span>
+                </p>
+                <button class="btn-gold px-8 py-3 rounded-lg text-lg font-bold btn-gold-glow" onclick="document.getElementById('auditoria').scrollIntoView({behavior: 'smooth'})">
+                    Explorar Propuesta ↓
+                </button>
+            </div>
+        </section>
 
-    <!-- Auditoría Técnica -->
-    <section id="auditoria" class="py-20 px-4 bg-gray-50">
-        <div class="max-w-6xl mx-auto">
-            <div class="mb-12">
-                <h2 class="section-title">Auditoría Técnica</h2>
-                <p class="text-gray-600 mt-6 text-lg">
-                    Documentación crítica para la Licencia de Obra Mayor (>1,500 m²) - Pendientes de Gestión por AYGA
+        <!-- Auditoría Técnica -->
+        <section id="auditoria" class="py-20 px-4 bg-gray-50">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-12">
+                    <h2 class="section-title">Auditoría Técnica</h2>
+                    <p class="text-gray-600 mt-6 text-lg">
+                        Documentación crítica para la Licencia de Obra Mayor (>1,500 m²) - Pendientes de Gestión por AYGA
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Documentos -->
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg">Escrituras Públicas</h4>
+                                <p class="text-sm text-gray-600 mt-1">Documento base de propiedad</p>
+                                <div class="tooltip-text">
+                                    Requisito fundamental para demostrar la titularidad del predio y validar la capacidad legal de realizar la obra.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg">Predial 2025</h4>
+                                <p class="text-sm text-gray-600 mt-1">Pago de contribución actualizado</p>
+                                <div class="tooltip-text">
+                                    Demuestra que el inmueble está al corriente con sus obligaciones fiscales municipales.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg">Registro PUAM</h4>
+                                <p class="text-sm text-gray-600 mt-1">Programa de Uso de Suelo</p>
+                                <div class="tooltip-text">
+                                    Valida que el uso industrial propuesto sea compatible con la zonificación municipal actual.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg">Alineamiento y Número Oficial</h4>
+                                <p class="text-sm text-gray-600 mt-1">Validación de límites prediales</p>
+                                <div class="tooltip-text">
+                                    Establece los límites legales del predio y confirma su identificación oficial ante autoridades.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg">Uso de Suelo</h4>
+                                <p class="text-sm text-gray-600 mt-1">Autorización municipal</p>
+                                <div class="tooltip-text">
+                                    Confirma que la actividad industrial es permitida en la zona y cumple con regulaciones locales.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg">Proyecto Ejecutivo</h4>
+                                <p class="text-sm text-gray-600 mt-1">Planos constructivos detallados</p>
+                                <div class="tooltip-text">
+                                    Define las especificaciones técnicas, materiales y sistemas constructivos de la obra.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg">Memoria de Cálculo</h4>
+                                <p class="text-sm text-gray-600 mt-1">Análisis estructural y de sistemas</p>
+                                <div class="tooltip-text">
+                                    Valida la seguridad estructural y el cumplimiento de normas de construcción vigentes.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg">Manifestación de Impacto Ambiental (MIA)</h4>
+                                <p class="text-sm text-gray-600 mt-1">Evaluación ambiental</p>
+                                <div class="tooltip-text">
+                                    Demuestra el compromiso con la sostenibilidad y cumplimiento de normativas ambientales federales.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg">Plan de Manejo de Residuos</h4>
+                                <p class="text-sm text-gray-600 mt-1">Gestión ambiental integral</p>
+                                <div class="tooltip-text">
+                                    Asegura la disposición responsable de residuos de construcción y operación de la bodega.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg">Factibilidad SOSAPAC</h4>
+                                <p class="text-sm text-gray-600 mt-1">Servicios de agua y drenaje</p>
+                                <div class="tooltip-text">
+                                    Confirma la disponibilidad de servicios de agua potable y drenaje para la operación industrial.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg">Impacto Vial</h4>
+                                <p class="text-sm text-gray-600 mt-1">Análisis de movilidad urbana</p>
+                                <div class="tooltip-text">
+                                    Evalúa el impacto del proyecto en la circulación vial y propone medidas de mitigación.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Propuesta Económica -->
+        <section class="py-20 px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-12">
+                    <h2 class="section-title">Propuesta Económica Detallada</h2>
+                    <p class="text-gray-600 mt-6 text-lg">
+                        Desglose de honorarios profesionales en 4 fases estratégicas
+                    </p>
+                </div>
+
+                <div class="table-container mb-8">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fase</th>
+                                <th>Descripción</th>
+                                <th>Duración</th>
+                                <th>Honorarios</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 1</span></td>
+                                <td>Diagnóstico, Auditoría Técnica y Gestión Documental</td>
+                                <td>4-6 semanas</td>
+                                <td class="font-bold">$45,000.00 MXN</td>
+                            </tr>
+                            <tr>
+                                <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 2</span></td>
+                                <td>Coordinación de Proyectos (Ejecutivo, MIA, Impacto Vial)</td>
+                                <td>6-8 semanas</td>
+                                <td class="font-bold">$65,000.00 MXN</td>
+                            </tr>
+                            <tr>
+                                <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 3</span></td>
+                                <td>Gestión Administrativa y Trámites Municipales</td>
+                                <td>8-10 semanas</td>
+                                <td class="font-bold">$75,000.00 MXN</td>
+                            </tr>
+                            <tr>
+                                <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 4</span></td>
+                                <td>Supervisión y Seguimiento hasta Licencia de Obra Mayor</td>
+                                <td>4-6 semanas</td>
+                                <td class="font-bold">$50,000.00 MXN</td>
+                            </tr>
+                            <tr style="background-color: rgba(197, 160, 33, 0.1);">
+                                <td colspan="3" class="font-bold text-right">Subtotal Honorarios AYGA:</td>
+                                <td class="font-bold" style="color: var(--dorado-metalico); font-size: 1.1rem;">$235,000.00 MXN</td>
+                            </tr>
+                            <tr style="background-color: rgba(197, 160, 33, 0.15);">
+                                <td colspan="3" class="font-bold text-right">IVA (16%):</td>
+                                <td class="font-bold" style="color: var(--dorado-metalico); font-size: 1.1rem;">$37,600.00 MXN</td>
+                            </tr>
+                            <tr style="background-color: var(--azul-profundo); color: white;">
+                                <td colspan="3" class="font-bold text-right">Total Honorarios AYGA:</td>
+                                <td class="font-bold" style="color: var(--dorado-metalico); font-size: 1.2rem;">$272,600.00 MXN</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert-box">
+                    <h4>⚠️ Derechos Gubernamentales Estimados</h4>
+                    <p>
+                        Adicional a los honorarios de AYGA, se estiman costos de derechos y trámites gubernamentales aproximados de <span class="font-bold">$305,000.00 MXN</span>. Estos incluyen: registro en PUAM, licencia de obra mayor, permisos de construcción, inspecciones municipales y certificaciones ambientales. Este monto es responsabilidad del cliente y será gestionado transparentemente por AYGA.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cronograma Estratégico -->
+        <section class="py-20 px-4 bg-gray-50">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-12">
+                    <h2 class="section-title">Cronograma Estratégico</h2>
+                    <p class="text-gray-600 mt-6 text-lg">
+                        Ruta crítica de 28 a 34 semanas para obtener la Licencia de Obra Mayor
+                    </p>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Semanas 1-6: Diagnóstico y Auditoría</h4>
+                            <p>Recopilación de documentación existente, análisis técnico del predio y elaboración de informe de hallazgos críticos.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Semanas 7-14: Coordinación de Proyectos</h4>
+                            <p>Gestión de consultorías especializadas: Proyecto Ejecutivo, MIA, Impacto Vial y Memoria de Cálculo.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Semanas 15-24: Trámites Municipales</h4>
+                            <p>Presentación de solicitudes, gestión de permisos de uso de suelo, alineamiento y coordinación con dependencias.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Semanas 25-34: Supervisión y Licencia</h4>
+                            <p>Seguimiento de observaciones, ajustes finales y obtención de la Licencia de Obra Mayor definitiva.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert-box mt-8">
+                    <h4>📋 Nota Importante</h4>
+                    <p>
+                        El cronograma puede variar según la respuesta de dependencias municipales y la complejidad de los estudios técnicos. AYGA se compromete a mantener comunicación transparente y reportes mensuales de avance.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Términos y Condiciones (para PDF) -->
+        <section class="py-20 px-4" style="page-break-before: always;">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="section-title">Términos y Condiciones</h2>
+                
+                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">1. Esquema de Pago</h3>
+                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
+                    Los honorarios de AYGA se distribuyen en tres pagos:
+                </p>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: #666; line-height: 1.8;">
+                    <li><strong>30%</strong> al inicio del proyecto (firma de contrato)</li>
+                    <li><strong>40%</strong> a mitad del proyecto (completar Fase 2)</li>
+                    <li><strong>30%</strong> al cierre (obtención de Licencia de Obra Mayor)</li>
+                </ul>
+
+                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">2. Responsabilidad Limitada</h3>
+                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
+                    AYGA actúa como gestor administrativo y coordinador de proyectos. La responsabilidad técnica de cada estudio (Proyecto Ejecutivo, MIA, etc.) recae en los consultores especializados contratados. AYGA no asume responsabilidad por deficiencias en dichos estudios, pero se compromete a supervisar su calidad.
+                </p>
+
+                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">3. Plazo de Ejecución</h3>
+                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
+                    El cronograma estimado es de 28 a 34 semanas. Retrasos causados por dependencias gubernamentales o cambios en requisitos municipales no serán responsabilidad de AYGA, pero se comunicarán oportunamente.
+                </p>
+
+                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">4. Modificaciones al Proyecto</h3>
+                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
+                    Cambios significativos en el alcance del proyecto después de la firma del contrato podrán generar costos adicionales, que serán cotizados por separado.
+                </p>
+
+                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">5. Confidencialidad</h3>
+                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
+                    Toda la información técnica y comercial del proyecto será tratada con confidencialidad absoluta.
                 </p>
             </div>
+        </section>
 
-            <div class="grid md:grid-cols-2 gap-6">
-                <!-- Documentos -->
-                <div class="checklist-item" onclick="toggleCheck(this)">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg">Escrituras Públicas</h4>
-                            <p class="text-sm text-gray-600 mt-1">Documento base de propiedad</p>
-                            <div class="tooltip-text">
-                                Requisito fundamental para demostrar la titularidad del predio y validar la capacidad legal de realizar la obra.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Aviso de Privacidad (para PDF) -->
+        <section class="py-20 px-4" style="page-break-before: always;">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="section-title">Aviso de Privacidad</h2>
+                
+                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">Responsable del Tratamiento de Datos</h3>
+                <p style="color: #666; line-height: 1.8; margin-top: 1rem;">
+                    <strong>Nombre:</strong> Rodolfo Camarillo Garcia<br>
+                    <strong>Domicilio:</strong> Calle Santa María 31, Cuautlancingo, Puebla<br>
+                    <strong>Email:</strong> ayga.contacto@gmail.com
+                </p>
 
-                <div class="checklist-item" onclick="toggleCheck(this)">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg">Predial 2025</h4>
-                            <p class="text-sm text-gray-600 mt-1">Pago de contribución actualizado</p>
-                            <div class="tooltip-text">
-                                Demuestra que el inmueble está al corriente con sus obligaciones fiscales municipales.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">Datos Personales Recopilados</h3>
+                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
+                    Se recopilan datos como nombre, teléfono, correo electrónico y datos de la propiedad exclusivamente para la gestión del proyecto y comunicaciones relacionadas.
+                </p>
 
-                <div class="checklist-item" onclick="toggleCheck(this)">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg">Registro PUAM</h4>
-                            <p class="text-sm text-gray-600 mt-1">Programa de Uso de Suelo</p>
-                            <div class="tooltip-text">
-                                Valida que el uso industrial propuesto sea compatible con la zonificación municipal actual.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">Uso de Datos</h3>
+                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
+                    Los datos se utilizan únicamente para:
+                </p>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: #666; line-height: 1.8;">
+                    <li>Gestión del proyecto de regularización</li>
+                    <li>Comunicaciones relacionadas con el servicio</li>
+                    <li>Cumplimiento de obligaciones legales</li>
+                </ul>
 
-                <div class="checklist-item" onclick="toggleCheck(this)">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg">Alineamiento y Número Oficial</h4>
-                            <p class="text-sm text-gray-600 mt-1">Validación de límites prediales</p>
-                            <div class="tooltip-text">
-                                Establece los límites legales del predio y confirma su identificación oficial ante autoridades.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">Derechos del Titular</h3>
+                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
+                    Usted tiene derecho a acceder, rectificar, cancelar u oponerme al tratamiento de sus datos personales. Para ejercer estos derechos, contacte a ayga.contacto@gmail.com.
+                </p>
 
-                <div class="checklist-item" onclick="toggleCheck(this)">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg">Uso de Suelo</h4>
-                            <p class="text-sm text-gray-600 mt-1">Autorización municipal</p>
-                            <div class="tooltip-text">
-                                Confirma que la actividad industrial es permitida en la zona y cumple con regulaciones locales.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="checklist-item" onclick="toggleCheck(this)">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg">Proyecto Ejecutivo</h4>
-                            <p class="text-sm text-gray-600 mt-1">Planos constructivos detallados</p>
-                            <div class="tooltip-text">
-                                Define las especificaciones técnicas, materiales y sistemas constructivos de la obra.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="checklist-item" onclick="toggleCheck(this)">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg">Memoria de Cálculo</h4>
-                            <p class="text-sm text-gray-600 mt-1">Análisis estructural y de sistemas</p>
-                            <div class="tooltip-text">
-                                Valida la seguridad estructural y el cumplimiento de normas de construcción vigentes.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="checklist-item" onclick="toggleCheck(this)">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg">Manifestación de Impacto Ambiental (MIA)</h4>
-                            <p class="text-sm text-gray-600 mt-1">Evaluación ambiental</p>
-                            <div class="tooltip-text">
-                                Demuestra el compromiso con la sostenibilidad y cumplimiento de normativas ambientales federales.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="checklist-item" onclick="toggleCheck(this)">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg">Plan de Manejo de Residuos</h4>
-                            <p class="text-sm text-gray-600 mt-1">Gestión ambiental integral</p>
-                            <div class="tooltip-text">
-                                Asegura la disposición responsable de residuos de construcción y operación de la bodega.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="checklist-item" onclick="toggleCheck(this)">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg">Factibilidad SOSAPAC</h4>
-                            <p class="text-sm text-gray-600 mt-1">Servicios de agua y drenaje</p>
-                            <div class="tooltip-text">
-                                Confirma la disponibilidad de servicios de agua potable y drenaje para la operación industrial.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="checklist-item" onclick="toggleCheck(this)">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg">Impacto Vial</h4>
-                            <p class="text-sm text-gray-600 mt-1">Análisis de movilidad urbana</p>
-                            <div class="tooltip-text">
-                                Evalúa el impacto del proyecto en la circulación vial y propone medidas de mitigación.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Propuesta Económica -->
-    <section class="py-20 px-4">
-        <div class="max-w-6xl mx-auto">
-            <div class="mb-12">
-                <h2 class="section-title">Propuesta Económica Detallada</h2>
-                <p class="text-gray-600 mt-6 text-lg">
-                    Desglose de honorarios profesionales en 4 fases estratégicas
+                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">Seguridad</h3>
+                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
+                    AYGA implementa medidas de seguridad para proteger sus datos personales contra acceso no autorizado.
                 </p>
             </div>
+        </section>
 
-            <div class="table-container mb-8">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fase</th>
-                            <th>Descripción</th>
-                            <th>Duración</th>
-                            <th>Honorarios</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 1</span></td>
-                            <td>Diagnóstico, Auditoría Técnica y Gestión Documental</td>
-                            <td>4-6 semanas</td>
-                            <td class="font-bold">$45,000.00 MXN</td>
-                        </tr>
-                        <tr>
-                            <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 2</span></td>
-                            <td>Coordinación de Proyectos (Ejecutivo, MIA, Impacto Vial)</td>
-                            <td>6-8 semanas</td>
-                            <td class="font-bold">$65,000.00 MXN</td>
-                        </tr>
-                        <tr>
-                            <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 3</span></td>
-                            <td>Gestión Administrativa y Trámites Municipales</td>
-                            <td>8-10 semanas</td>
-                            <td class="font-bold">$75,000.00 MXN</td>
-                        </tr>
-                        <tr>
-                            <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 4</span></td>
-                            <td>Supervisión y Seguimiento hasta Licencia de Obra Mayor</td>
-                            <td>4-6 semanas</td>
-                            <td class="font-bold">$50,000.00 MXN</td>
-                        </tr>
-                        <tr style="background-color: rgba(197, 160, 33, 0.1);">
-                            <td colspan="3" class="font-bold text-right">Subtotal Honorarios AYGA:</td>
-                            <td class="font-bold" style="color: var(--dorado-metalico); font-size: 1.1rem;">$235,000.00 MXN</td>
-                        </tr>
-                        <tr style="background-color: rgba(197, 160, 33, 0.15);">
-                            <td colspan="3" class="font-bold text-right">IVA (16%):</td>
-                            <td class="font-bold" style="color: var(--dorado-metalico); font-size: 1.1rem;">$37,600.00 MXN</td>
-                        </tr>
-                        <tr style="background-color: var(--azul-profundo); color: white;">
-                            <td colspan="3" class="font-bold text-right">Total Honorarios AYGA:</td>
-                            <td class="font-bold" style="color: var(--dorado-metalico); font-size: 1.2rem;">$272,600.00 MXN</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="alert-box">
-                <h4>⚠️ Derechos Gubernamentales Estimados</h4>
-                <p>
-                    Adicional a los honorarios de AYGA, se estiman costos de derechos y trámites gubernamentales aproximados de <span class="font-bold">$305,000.00 MXN</span>. Estos incluyen: registro en PUAM, licencia de obra mayor, permisos de construcción, inspecciones municipales y certificaciones ambientales. Este monto es responsabilidad del cliente y será gestionado transparentemente por AYGA.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Cronograma Estratégico -->
-    <section class="py-20 px-4 bg-gray-50">
-        <div class="max-w-6xl mx-auto">
-            <div class="mb-12">
-                <h2 class="section-title">Cronograma Estratégico</h2>
-                <p class="text-gray-600 mt-6 text-lg">
-                    Ruta crítica de 28 a 34 semanas para obtener la Licencia de Obra Mayor
-                </p>
-            </div>
-
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <h4>Semanas 1-6: Diagnóstico y Auditoría</h4>
-                        <p>Recopilación de documentación existente, análisis técnico del predio y elaboración de informe de hallazgos críticos.</p>
-                    </div>
+        <!-- Información de Contacto (para PDF) -->
+        <section class="py-20 px-4 bg-gray-50" style="page-break-before: always;">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="section-title">Información de Contacto</h2>
+                
+                <div style="background: white; padding: 2rem; border-radius: 8px; margin-top: 2rem; border-left: 4px solid var(--dorado-metalico);">
+                    <h3 style="color: var(--azul-profundo); font-weight: 700; font-size: 1.2rem; margin-bottom: 1rem;">AYGA - Asesoría y Gestión Administrativa</h3>
+                    
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 1rem;">
+                        <strong style="color: var(--azul-profundo);">Responsable:</strong> Rodolfo Camarillo Garcia
+                    </p>
+                    
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 1rem;">
+                        <strong style="color: var(--azul-profundo);">Domicilio:</strong> Calle Santa María 31, Cuautlancingo, Puebla
+                    </p>
+                    
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 1rem;">
+                        <strong style="color: var(--azul-profundo);">Teléfono:</strong> 222 524 9941
+                    </p>
+                    
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 1rem;">
+                        <strong style="color: var(--azul-profundo);">Email:</strong> ayga.contacto@gmail.com
+                    </p>
+                    
+                    <p style="color: #666; line-height: 1.8;">
+                        <strong style="color: var(--azul-profundo);">WhatsApp:</strong> +52 222 525 3621
+                    </p>
                 </div>
 
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <h4>Semanas 7-14: Coordinación de Proyectos</h4>
-                        <p>Gestión de consultorías especializadas: Proyecto Ejecutivo, MIA, Impacto Vial y Memoria de Cálculo.</p>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <h4>Semanas 15-24: Trámites Municipales</h4>
-                        <p>Presentación de solicitudes, gestión de permisos de uso de suelo, alineamiento y coordinación con dependencias.</p>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <h4>Semanas 25-34: Supervisión y Licencia</h4>
-                        <p>Seguimiento de observaciones, ajustes finales y obtención de la Licencia de Obra Mayor definitiva.</p>
-                    </div>
+                <div style="background: linear-gradient(135deg, rgba(197, 160, 33, 0.1) 0%, rgba(232, 213, 168, 0.05) 100%); border-left: 4px solid var(--dorado-metalico); padding: 1.5rem; border-radius: 8px; margin-top: 2rem;">
+                    <h4 style="color: var(--dorado-metalico); font-weight: 700; margin-bottom: 0.5rem;">📋 Documento Confidencial</h4>
+                    <p style="color: var(--azul-profundo); margin: 0; font-weight: 500;">
+                        Este documento contiene información confidencial y propietaria de AYGA. Está destinado exclusivamente para Jose Carrillo - Espacios Lerma SA de CV. Se prohíbe su reproducción, distribución o divulgación sin autorización expresa.
+                    </p>
                 </div>
             </div>
-
-            <div class="alert-box mt-8">
-                <h4>📋 Nota Importante</h4>
-                <p>
-                    El cronograma puede variar según la respuesta de dependencias municipales y la complejidad de los estudios técnicos. AYGA se compromete a mantener comunicación transparente y reportes mensuales de avance.
-                </p>
-            </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
     <!-- Footer -->
     <footer>
@@ -1148,10 +1319,27 @@
             }
         }
 
-        // Función para descargar PDF
-        function downloadPDF() {
-            alert('Función de descarga de PDF. En una implementación real, esto generaría un PDF con toda la propuesta.');
-            // Aquí se podría integrar una librería como jsPDF o enviar a un servidor
+        // Función para generar PDF
+        function generatePDF() {
+            const loader = document.getElementById('pdfLoader');
+            loader.classList.add('active');
+
+            const element = document.getElementById('pdfContent');
+            const opt = {
+                margin: 10,
+                filename: 'Cotizacion_AYGA_Espacios_Lerma_Sanctorum.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                loader.classList.remove('active');
+            }).catch(error => {
+                console.error('Error al generar PDF:', error);
+                loader.classList.remove('active');
+                alert('Hubo un error al generar el PDF. Por favor, intenta de nuevo.');
+            });
         }
 
         // Animaciones de scroll
