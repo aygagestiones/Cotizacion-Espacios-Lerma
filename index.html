@@ -3,1364 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cotización Interactiva - AYGA Asesoría y Gestión Administrativa</title>
+    <title>Cotización Exclusiva - AYGA Asesoría y Gestión</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * {
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        :root {
-            --azul-profundo: #002147;
-            --dorado-metalico: #C5A021;
-            --dorado-claro: #E8D5A8;
-            --gris-claro: #F5F5F5;
-        }
-
-        /* Animaciones de entrada */
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes glowPulse {
-            0%, 100% {
-                box-shadow: 0 0 10px rgba(197, 160, 33, 0.5);
-            }
-            50% {
-                box-shadow: 0 0 20px rgba(197, 160, 33, 0.8);
-            }
-        }
-
-        .animate-fade-in-down {
-            animation: fadeInDown 0.8s ease-out;
-        }
-
-        .animate-fade-in-up {
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        .animate-slide-in-left {
-            animation: slideInLeft 0.8s ease-out;
-        }
-
-        /* Botones dorados con efecto glow */
-        .btn-gold {
-            background-color: var(--dorado-metalico);
-            color: var(--azul-profundo);
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: 2px solid var(--dorado-metalico);
-        }
-
-        .btn-gold:hover {
-            background-color: transparent;
-            color: var(--dorado-metalico);
-            box-shadow: 0 0 20px rgba(197, 160, 33, 0.6);
-            transform: translateY(-2px);
-        }
-
-        .btn-gold-glow {
-            animation: glowPulse 2s infinite;
-        }
-
-        /* Estilos generales */
-        body {
-            background-color: #ffffff;
-            color: var(--azul-profundo);
-            scroll-behavior: smooth;
-        }
-
-        header {
-            background: linear-gradient(135deg, var(--azul-profundo) 0%, #003d6b 100%);
-            box-shadow: 0 4px 15px rgba(0, 33, 71, 0.2);
-        }
-
-        .hero-section {
-            background: linear-gradient(135deg, var(--azul-profundo) 0%, #003d6b 100%);
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(197, 160, 33, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .section-title {
-            color: var(--azul-profundo);
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            position: relative;
-            display: inline-block;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--dorado-metalico) 0%, transparent 100%);
-        }
-
-        .checklist-item {
-            background: white;
-            border-left: 4px solid var(--dorado-metalico);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 33, 71, 0.08);
-        }
-
-        .checklist-item:hover {
-            box-shadow: 0 8px 20px rgba(197, 160, 33, 0.15);
-            transform: translateX(5px);
-        }
-
-        .checklist-item.checked {
-            background: linear-gradient(135deg, rgba(197, 160, 33, 0.1) 0%, rgba(232, 213, 168, 0.05) 100%);
-        }
-
-        .tooltip-text {
-            display: none;
-            background-color: var(--azul-profundo);
-            color: white;
-            text-align: center;
-            padding: 0.75rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-            line-height: 1.4;
-        }
-
-        .checklist-item:hover .tooltip-text {
-            display: block;
-            animation: fadeInUp 0.3s ease-out;
-        }
-
-        /* Tabla de honorarios */
-        .table-container {
-            overflow-x: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 33, 71, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background-color: var(--azul-profundo);
-            color: white;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        tr:hover {
-            background-color: rgba(197, 160, 33, 0.05);
-        }
-
-        /* Timeline */
-        .timeline {
-            position: relative;
-            padding: 2rem 0;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(180deg, var(--dorado-metalico) 0%, var(--azul-profundo) 100%);
-        }
-
-        .timeline-item {
-            margin-bottom: 3rem;
-            position: relative;
-        }
-
-        .timeline-item:nth-child(odd) .timeline-content {
-            margin-left: 0;
-            margin-right: 52%;
-            text-align: right;
-        }
-
-        .timeline-item:nth-child(even) .timeline-content {
-            margin-left: 52%;
-            margin-right: 0;
-            text-align: left;
-        }
-
-        .timeline-marker {
-            position: absolute;
-            left: 50%;
-            top: 0;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 20px;
-            background-color: var(--dorado-metalico);
-            border: 4px solid white;
-            border-radius: 50%;
-            box-shadow: 0 0 0 4px var(--azul-profundo);
-            z-index: 10;
-        }
-
-        .timeline-content {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 33, 71, 0.1);
-            border-left: 4px solid var(--dorado-metalico);
-        }
-
-        .timeline-content h4 {
-            color: var(--dorado-metalico);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .timeline-content p {
-            color: #666;
-            font-size: 0.95rem;
-        }
-
-        /* Chatbot flotante */
-        .chatbot-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 380px;
-            max-height: 600px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 33, 71, 0.2);
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-            animation: slideInUp 0.5s ease-out;
-        }
-
-        .chatbot-header {
-            background: linear-gradient(135deg, var(--azul-profundo) 0%, #003d6b 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 12px 12px 0 0;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chatbot-close {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .chatbot-close:hover {
-            background: rgba(255, 255, 255, 0.4);
-        }
-
-        .chatbot-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.5rem;
-            background: #f9f9f9;
-        }
-
-        .message {
-            margin-bottom: 1rem;
-            display: flex;
-            animation: fadeInUp 0.3s ease-out;
-        }
-
-        .message.bot {
-            justify-content: flex-start;
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        .message-content {
-            max-width: 70%;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        .message.bot .message-content {
-            background-color: var(--azul-profundo);
-            color: white;
-            border-bottom-left-radius: 2px;
-        }
-
-        .message.user .message-content {
-            background-color: var(--dorado-metalico);
-            color: var(--azul-profundo);
-            border-bottom-right-radius: 2px;
-        }
-
-        .chatbot-input {
-            display: flex;
-            padding: 1rem;
-            gap: 0.5rem;
-            background: white;
-            border-top: 1px solid #e5e7eb;
-            border-radius: 0 0 12px 12px;
-        }
-
-        .chatbot-input input {
-            flex: 1;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 0.75rem;
-            font-size: 0.9rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .chatbot-input input:focus {
-            outline: none;
-            border-color: var(--dorado-metalico);
-            box-shadow: 0 0 10px rgba(197, 160, 33, 0.2);
-        }
-
-        .chatbot-input button {
-            background-color: var(--dorado-metalico);
-            color: var(--azul-profundo);
-            border: none;
-            border-radius: 6px;
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .chatbot-input button:hover {
-            background-color: var(--azul-profundo);
-            color: var(--dorado-metalico);
-            transform: scale(1.05);
-        }
-
-        .whatsapp-btn {
-            display: inline-block;
-            background-color: #25D366;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .whatsapp-btn:hover {
-            background-color: #20ba5a;
-            transform: scale(1.05);
-        }
-
-        /* Modales */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 2rem;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 700px;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-            max-height: 80vh;
-            overflow-y: auto;
-            animation: slideInUp 0.3s ease-out;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid var(--dorado-metalico);
-            padding-bottom: 1rem;
-        }
-
-        .modal-header h2 {
-            color: var(--azul-profundo);
-            font-weight: 700;
-            margin: 0;
-        }
-
-        .close-modal {
-            color: var(--azul-profundo);
-            font-size: 2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .close-modal:hover {
-            color: var(--dorado-metalico);
-        }
-
-        /* Footer */
-        footer {
-            background: linear-gradient(135deg, var(--azul-profundo) 0%, #003d6b 100%);
-            color: white;
-            padding: 3rem 0 1rem;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-section h3 {
-            color: var(--dorado-metalico);
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .footer-section p {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #e0e0e0;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: var(--dorado-metalico);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .footer-links a:hover {
-            color: white;
-            text-decoration: underline;
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(197, 160, 33, 0.3);
-            padding-top: 1.5rem;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #b0b0b0;
-        }
-
-        /* Nota destacada */
-        .alert-box {
-            background: linear-gradient(135deg, rgba(197, 160, 33, 0.1) 0%, rgba(232, 213, 168, 0.05) 100%);
-            border-left: 4px solid var(--dorado-metalico);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 2rem 0;
-        }
-
-        .alert-box h4 {
-            color: var(--dorado-metalico);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .alert-box p {
-            color: var(--azul-profundo);
-            margin: 0;
-            font-weight: 500;
-        }
-
-        /* Estilos para PDF */
-        @media print {
-            .chatbot-container,
-            .btn-gold,
-            footer {
-                display: none !important;
-            }
-            
-            body {
-                background: white;
-            }
-        }
-
-        /* Loader para PDF */
-        .pdf-loader {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-            z-index: 2000;
-            text-align: center;
-        }
-
-        .pdf-loader.active {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--dorado-metalico);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .section-title {
-                font-size: 1.8rem;
-            }
-
-            .timeline::before {
-                left: 20px;
-            }
-
-            .timeline-item:nth-child(odd) .timeline-content,
-            .timeline-item:nth-child(even) .timeline-content {
-                margin-left: 60px;
-                margin-right: 0;
-                text-align: left;
-            }
-
-            .timeline-marker {
-                left: 20px;
-            }
-
-            .chatbot-container {
-                width: calc(100% - 40px);
-                max-height: 500px;
-            }
-
-            .hero-section::before {
-                width: 250px;
-                height: 250px;
-            }
-        }
+        body { font-family: 'Montserrat', sans-serif; scroll-behavior: smooth; }
+       .bg-ayga-blue { background-color: #002147; }
+       .text-ayga-gold { color: #C5A021; }
+       .bg-ayga-gold { background-color: #C5A021; }
+       .border-ayga-gold { border-color: #C5A021; }
+       .glow-button:hover { box-shadow: 0 0 15px #C5A021; transition: 0.3s; }
+       .pdf-page { padding: 40px; background: white; }
     </style>
 </head>
-<body>
-    <!-- Loader PDF -->
-    <div class="pdf-loader" id="pdfLoader">
-        <div class="spinner"></div>
-        <p style="color: var(--azul-profundo); font-weight: 600;">Generando PDF...</p>
-    </div>
+<body class="bg-gray-50 text-gray-800">
 
-    <!-- Header -->
-    <header class="sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
-                    <span class="text-2xl font-bold" style="color: var(--azul-profundo);">A</span>
-                </div>
-                <div>
-                    <h1 class="text-white font-bold text-lg">AYGA</h1>
-                    <p class="text-xs text-gray-300">Asesoría y Gestión</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-6">
-                <div class="hidden md:flex items-center gap-2 text-white">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773c.058.3.102.605.102.924v1.575c0 .319-.044.624-.102.924l1.547.773a1 1 0 01.54 1.06l-.74 4.435a1 1 0 01-.986.836H3a1 1 0 01-1-1V3z"></path>
-                    </svg>
-                    <span class="text-sm font-semibold">222 524 9941</span>
-                </div>
-                <button class="btn-gold px-6 py-2 rounded-lg text-sm font-semibold" onclick="generatePDF()">
-                    📥 Descargar PDF
+    <nav class="bg-ayga-blue p-4 sticky top-0 z-50 shadow-xl no-print">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-ayga-gold font-bold text-2xl tracking-tighter">AYGA</div>
+            <div class="hidden md:flex space-x-6 text-white text-sm items-center">
+                <span><i class="fas fa-phone"></i> 222 524 9941</span>
+                <button onclick="downloadPDF()" class="bg-ayga-gold text-ayga-blue px-4 py-2 rounded font-bold glow-button">
+                    DESCARGAR PDF
                 </button>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <!-- Contenido para PDF -->
-    <div id="pdfContent">
-        <!-- Hero Section -->
-        <section class="hero-section py-20 px-4 relative">
-            <div class="max-w-4xl mx-auto text-center relative z-10">
-                <h2 class="text-5xl md:text-6xl font-bold mb-4 animate-fade-in-down">
-                    Estrategia de Regularización y Gestión
+    <div id="quotation-content" class="container mx-auto my-10 max-w-4xl bg-white shadow-2xl rounded-lg overflow-hidden border border-gray-200">
+        
+        <div class="p-10 border-b-4 border-ayga-gold">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-ayga-blue text-3xl font-bold uppercase">Propuesta Técnica y Económica</h1>
+                    <p class="text-gray-500 mt-1">Proyecto: Bodega Industrial Sanctorum</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-ayga-blue">AYGA ASESORÍA</p>
+                    <p class="text-xs text-gray-500">Gestión Integral de Obra Mayor</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-10">
+            <div class="mb-8 grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <h3 class="font-bold text-ayga-blue border-b border-ayga-gold mb-2 uppercase">Cliente</h3>
+                    <p class="font-semibold text-lg">Jose Carrillo</p>
+                    <p>Espacios Lerma SA de CV</p>
+                    <p>Email: jcarrillo@cgamx.com</p>
+                </div>
+                <div class="text-right">
+                    <h3 class="font-bold text-ayga-blue border-b border-ayga-gold mb-2 uppercase">Referencia</h3>
+                    <p>Fecha: 19 de Marzo, 2026</p>
+                    <p>Ubicación: Río Papaloapan, Sanctorum</p>
+                </div>
+            </div>
+
+            <div class="mb-10">
+                <h2 class="text-xl font-bold text-ayga-blue mb-4 flex items-center">
+                    <span class="mr-2">📋</span> AUDITORÍA DE DOCUMENTACIÓN (REQUISITOS PENDIENTES)
                 </h2>
-                <h3 class="text-2xl md:text-3xl mb-8 text-yellow-300 animate-fade-in-up">
-                    Proyecto Sanctorum
-                </h3>
-                <p class="text-xl text-gray-200 mb-8 animate-fade-in-up">
-                    Preparado exclusivamente para <span class="font-bold text-yellow-300">Jose Carrillo</span> - <span class="font-bold">Espacios Lerma SA de CV</span>
-                </p>
-                <button class="btn-gold px-8 py-3 rounded-lg text-lg font-bold btn-gold-glow" onclick="document.getElementById('auditoria').scrollIntoView({behavior: 'smooth'})">
-                    Explorar Propuesta ↓
-                </button>
-            </div>
-        </section>
-
-        <!-- Auditoría Técnica -->
-        <section id="auditoria" class="py-20 px-4 bg-gray-50">
-            <div class="max-w-6xl mx-auto">
-                <div class="mb-12">
-                    <h2 class="section-title">Auditoría Técnica</h2>
-                    <p class="text-gray-600 mt-6 text-lg">
-                        Documentación crítica para la Licencia de Obra Mayor (>1,500 m²) - Pendientes de Gestión por AYGA
-                    </p>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-6">
-                    <!-- Documentos -->
-                    <div class="checklist-item" onclick="toggleCheck(this)">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-lg">Escrituras Públicas</h4>
-                                <p class="text-sm text-gray-600 mt-1">Documento base de propiedad</p>
-                                <div class="tooltip-text">
-                                    Requisito fundamental para demostrar la titularidad del predio y validar la capacidad legal de realizar la obra.
-                                </div>
-                            </div>
-                        </div>
+                <div class="grid md:grid-cols-2 gap-3">
+                    <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                        <span class="text-red-500 font-bold mr-3">✘</span> <span class="text-xs">Escrituras / Certeza Jurídica</span>
                     </div>
-
-                    <div class="checklist-item" onclick="toggleCheck(this)">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-lg">Predial 2025</h4>
-                                <p class="text-sm text-gray-600 mt-1">Pago de contribución actualizado</p>
-                                <div class="tooltip-text">
-                                    Demuestra que el inmueble está al corriente con sus obligaciones fiscales municipales.
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                        <span class="text-red-500 font-bold mr-3">✘</span> <span class="text-xs">Predial 2025/2026</span>
                     </div>
-
-                    <div class="checklist-item" onclick="toggleCheck(this)">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-lg">Registro PUAM</h4>
-                                <p class="text-sm text-gray-600 mt-1">Programa de Uso de Suelo</p>
-                                <div class="tooltip-text">
-                                    Valida que el uso industrial propuesto sea compatible con la zonificación municipal actual.
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                        <span class="text-red-500 font-bold mr-3">✘</span> <span class="text-xs">Registro PUAM Cuautlancingo</span>
                     </div>
-
-                    <div class="checklist-item" onclick="toggleCheck(this)">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-lg">Alineamiento y Número Oficial</h4>
-                                <p class="text-sm text-gray-600 mt-1">Validación de límites prediales</p>
-                                <div class="tooltip-text">
-                                    Establece los límites legales del predio y confirma su identificación oficial ante autoridades.
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                        <span class="text-red-500 font-bold mr-3">✘</span> <span class="text-xs">Alineamiento y No. Oficial</span>
                     </div>
-
-                    <div class="checklist-item" onclick="toggleCheck(this)">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-lg">Uso de Suelo</h4>
-                                <p class="text-sm text-gray-600 mt-1">Autorización municipal</p>
-                                <div class="tooltip-text">
-                                    Confirma que la actividad industrial es permitida en la zona y cumple con regulaciones locales.
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                        <span class="text-red-500 font-bold mr-3">✘</span> <span class="text-xs">Dictamen de Uso de Suelo</span>
                     </div>
-
-                    <div class="checklist-item" onclick="toggleCheck(this)">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-lg">Proyecto Ejecutivo</h4>
-                                <p class="text-sm text-gray-600 mt-1">Planos constructivos detallados</p>
-                                <div class="tooltip-text">
-                                    Define las especificaciones técnicas, materiales y sistemas constructivos de la obra.
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                        <span class="text-red-500 font-bold mr-3">✘</span> <span class="text-xs">Proyecto Ejecutivo (Arq/Inst)</span>
                     </div>
-
-                    <div class="checklist-item" onclick="toggleCheck(this)">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-lg">Memoria de Cálculo</h4>
-                                <p class="text-sm text-gray-600 mt-1">Análisis estructural y de sistemas</p>
-                                <div class="tooltip-text">
-                                    Valida la seguridad estructural y el cumplimiento de normas de construcción vigentes.
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                        <span class="text-red-500 font-bold mr-3">✘</span> <span class="text-xs">Memoria de Cálculo Estructural</span>
                     </div>
-
-                    <div class="checklist-item" onclick="toggleCheck(this)">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-lg">Manifestación de Impacto Ambiental (MIA)</h4>
-                                <p class="text-sm text-gray-600 mt-1">Evaluación ambiental</p>
-                                <div class="tooltip-text">
-                                    Demuestra el compromiso con la sostenibilidad y cumplimiento de normativas ambientales federales.
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                        <span class="text-red-500 font-bold mr-3">✘</span> <span class="text-xs">Manifestación de Impacto Ambiental</span>
                     </div>
-
-                    <div class="checklist-item" onclick="toggleCheck(this)">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-lg">Plan de Manejo de Residuos</h4>
-                                <p class="text-sm text-gray-600 mt-1">Gestión ambiental integral</p>
-                                <div class="tooltip-text">
-                                    Asegura la disposición responsable de residuos de construcción y operación de la bodega.
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                        <span class="text-red-500 font-bold mr-3">✘</span> <span class="text-xs">Plan de Manejo de Residuos</span>
                     </div>
-
-                    <div class="checklist-item" onclick="toggleCheck(this)">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-lg">Factibilidad SOSAPAC</h4>
-                                <p class="text-sm text-gray-600 mt-1">Servicios de agua y drenaje</p>
-                                <div class="tooltip-text">
-                                    Confirma la disponibilidad de servicios de agua potable y drenaje para la operación industrial.
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                        <span class="text-red-500 font-bold mr-3">✘</span> <span class="text-xs">Factibilidad SOSAPAC</span>
                     </div>
-
-                    <div class="checklist-item" onclick="toggleCheck(this)">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 w-5 h-5 cursor-pointer" style="accent-color: var(--dorado-metalico);">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-lg">Impacto Vial</h4>
-                                <p class="text-sm text-gray-600 mt-1">Análisis de movilidad urbana</p>
-                                <div class="tooltip-text">
-                                    Evalúa el impacto del proyecto en la circulación vial y propone medidas de mitigación.
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                        <span class="text-red-500 font-bold mr-3">✘</span> <span class="text-xs">Estudio de Impacto Vial</span>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Propuesta Económica -->
-        <section class="py-20 px-4">
-            <div class="max-w-6xl mx-auto">
-                <div class="mb-12">
-                    <h2 class="section-title">Propuesta Económica Detallada</h2>
-                    <p class="text-gray-600 mt-6 text-lg">
-                        Desglose de honorarios profesionales en 4 fases estratégicas
-                    </p>
+            <div class="mb-10">
+                <h2 class="text-xl font-bold text-ayga-blue mb-4">💰 ESTRUCTURA DE HONORARIOS</h2>
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="bg-ayga-blue text-white">
+                            <th class="p-3">Fase de Gestión</th>
+                            <th class="p-3 text-right">Monto (MXN)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border">
+                        <tr class="border-b">
+                            <td class="p-3">Fase 1: Certeza Jurídica y Permisos Básicos</td>
+                            <td class="p-3 text-right">$45,000.00</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-3">Fase 2: Coordinación Técnica e Integración de Proyecto</td>
+                            <td class="p-3 text-right">$65,000.00</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-3">Fase 3: Dictámenes Estatales y Factibilidades Especiales</td>
+                            <td class="p-3 text-right">$85,000.00</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-3">Fase 4: Obtención de Licencia de Obra Mayor</td>
+                            <td class="p-3 text-right">$40,000.00</td>
+                        </tr>
+                        <tr class="bg-gray-100 font-bold">
+                            <td class="p-3 text-ayga-blue">SUBTOTAL HONORARIOS AYGA</td>
+                            <td class="p-3 text-right text-ayga-blue text-lg">$235,000.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="text-xs text-gray-500 mt-2">* Precios más IVA. No incluye pago de derechos gubernamentales (~$305,000 MXN).</p>
+            </div>
+
+            <div class="mt-20 pt-10 border-t flex justify-between items-center text-xs text-gray-400">
+                <div>
+                    <p>Rodolfo Camarillo Garcia</p>
+                    <p>AYGA Asesoría y Gestión Administrativa</p>
                 </div>
-
-                <div class="table-container mb-8">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Fase</th>
-                                <th>Descripción</th>
-                                <th>Duración</th>
-                                <th>Honorarios</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 1</span></td>
-                                <td>Diagnóstico, Auditoría Técnica y Gestión Documental</td>
-                                <td>4-6 semanas</td>
-                                <td class="font-bold">$45,000.00 MXN</td>
-                            </tr>
-                            <tr>
-                                <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 2</span></td>
-                                <td>Coordinación de Proyectos (Ejecutivo, MIA, Impacto Vial)</td>
-                                <td>6-8 semanas</td>
-                                <td class="font-bold">$65,000.00 MXN</td>
-                            </tr>
-                            <tr>
-                                <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 3</span></td>
-                                <td>Gestión Administrativa y Trámites Municipales</td>
-                                <td>8-10 semanas</td>
-                                <td class="font-bold">$75,000.00 MXN</td>
-                            </tr>
-                            <tr>
-                                <td><span class="font-bold" style="color: var(--dorado-metalico);">Fase 4</span></td>
-                                <td>Supervisión y Seguimiento hasta Licencia de Obra Mayor</td>
-                                <td>4-6 semanas</td>
-                                <td class="font-bold">$50,000.00 MXN</td>
-                            </tr>
-                            <tr style="background-color: rgba(197, 160, 33, 0.1);">
-                                <td colspan="3" class="font-bold text-right">Subtotal Honorarios AYGA:</td>
-                                <td class="font-bold" style="color: var(--dorado-metalico); font-size: 1.1rem;">$235,000.00 MXN</td>
-                            </tr>
-                            <tr style="background-color: rgba(197, 160, 33, 0.15);">
-                                <td colspan="3" class="font-bold text-right">IVA (16%):</td>
-                                <td class="font-bold" style="color: var(--dorado-metalico); font-size: 1.1rem;">$37,600.00 MXN</td>
-                            </tr>
-                            <tr style="background-color: var(--azul-profundo); color: white;">
-                                <td colspan="3" class="font-bold text-right">Total Honorarios AYGA:</td>
-                                <td class="font-bold" style="color: var(--dorado-metalico); font-size: 1.2rem;">$272,600.00 MXN</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="alert-box">
-                    <h4>⚠️ Derechos Gubernamentales Estimados</h4>
-                    <p>
-                        Adicional a los honorarios de AYGA, se estiman costos de derechos y trámites gubernamentales aproximados de <span class="font-bold">$305,000.00 MXN</span>. Estos incluyen: registro en PUAM, licencia de obra mayor, permisos de construcción, inspecciones municipales y certificaciones ambientales. Este monto es responsabilidad del cliente y será gestionado transparentemente por AYGA.
-                    </p>
+                <div class="text-right">
+                    <p>Tel: 222 524 9941</p>
+                    <p>Email: ayga.contacto@gmail.com</p>
                 </div>
             </div>
-        </section>
-
-        <!-- Cronograma Estratégico -->
-        <section class="py-20 px-4 bg-gray-50">
-            <div class="max-w-6xl mx-auto">
-                <div class="mb-12">
-                    <h2 class="section-title">Cronograma Estratégico</h2>
-                    <p class="text-gray-600 mt-6 text-lg">
-                        Ruta crítica de 28 a 34 semanas para obtener la Licencia de Obra Mayor
-                    </p>
-                </div>
-
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <h4>Semanas 1-6: Diagnóstico y Auditoría</h4>
-                            <p>Recopilación de documentación existente, análisis técnico del predio y elaboración de informe de hallazgos críticos.</p>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <h4>Semanas 7-14: Coordinación de Proyectos</h4>
-                            <p>Gestión de consultorías especializadas: Proyecto Ejecutivo, MIA, Impacto Vial y Memoria de Cálculo.</p>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <h4>Semanas 15-24: Trámites Municipales</h4>
-                            <p>Presentación de solicitudes, gestión de permisos de uso de suelo, alineamiento y coordinación con dependencias.</p>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <h4>Semanas 25-34: Supervisión y Licencia</h4>
-                            <p>Seguimiento de observaciones, ajustes finales y obtención de la Licencia de Obra Mayor definitiva.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="alert-box mt-8">
-                    <h4>📋 Nota Importante</h4>
-                    <p>
-                        El cronograma puede variar según la respuesta de dependencias municipales y la complejidad de los estudios técnicos. AYGA se compromete a mantener comunicación transparente y reportes mensuales de avance.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Términos y Condiciones (para PDF) -->
-        <section class="py-20 px-4" style="page-break-before: always;">
-            <div class="max-w-6xl mx-auto">
-                <h2 class="section-title">Términos y Condiciones</h2>
-                
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">1. Esquema de Pago</h3>
-                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
-                    Los honorarios de AYGA se distribuyen en tres pagos:
-                </p>
-                <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: #666; line-height: 1.8;">
-                    <li><strong>30%</strong> al inicio del proyecto (firma de contrato)</li>
-                    <li><strong>40%</strong> a mitad del proyecto (completar Fase 2)</li>
-                    <li><strong>30%</strong> al cierre (obtención de Licencia de Obra Mayor)</li>
-                </ul>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">2. Responsabilidad Limitada</h3>
-                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
-                    AYGA actúa como gestor administrativo y coordinador de proyectos. La responsabilidad técnica de cada estudio (Proyecto Ejecutivo, MIA, etc.) recae en los consultores especializados contratados. AYGA no asume responsabilidad por deficiencias en dichos estudios, pero se compromete a supervisar su calidad.
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">3. Plazo de Ejecución</h3>
-                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
-                    El cronograma estimado es de 28 a 34 semanas. Retrasos causados por dependencias gubernamentales o cambios en requisitos municipales no serán responsabilidad de AYGA, pero se comunicarán oportunamente.
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">4. Modificaciones al Proyecto</h3>
-                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
-                    Cambios significativos en el alcance del proyecto después de la firma del contrato podrán generar costos adicionales, que serán cotizados por separado.
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">5. Confidencialidad</h3>
-                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
-                    Toda la información técnica y comercial del proyecto será tratada con confidencialidad absoluta.
-                </p>
-            </div>
-        </section>
-
-        <!-- Aviso de Privacidad (para PDF) -->
-        <section class="py-20 px-4" style="page-break-before: always;">
-            <div class="max-w-6xl mx-auto">
-                <h2 class="section-title">Aviso de Privacidad</h2>
-                
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">Responsable del Tratamiento de Datos</h3>
-                <p style="color: #666; line-height: 1.8; margin-top: 1rem;">
-                    <strong>Nombre:</strong> Rodolfo Camarillo Garcia<br>
-                    <strong>Domicilio:</strong> Calle Santa María 31, Cuautlancingo, Puebla<br>
-                    <strong>Email:</strong> ayga.contacto@gmail.com
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">Datos Personales Recopilados</h3>
-                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
-                    Se recopilan datos como nombre, teléfono, correo electrónico y datos de la propiedad exclusivamente para la gestión del proyecto y comunicaciones relacionadas.
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">Uso de Datos</h3>
-                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
-                    Los datos se utilizan únicamente para:
-                </p>
-                <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: #666; line-height: 1.8;">
-                    <li>Gestión del proyecto de regularización</li>
-                    <li>Comunicaciones relacionadas con el servicio</li>
-                    <li>Cumplimiento de obligaciones legales</li>
-                </ul>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">Derechos del Titular</h3>
-                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
-                    Usted tiene derecho a acceder, rectificar, cancelar u oponerme al tratamiento de sus datos personales. Para ejercer estos derechos, contacte a ayga.contacto@gmail.com.
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 2rem; font-size: 1.3rem;">Seguridad</h3>
-                <p style="color: #666; line-height: 1.6; margin-top: 1rem;">
-                    AYGA implementa medidas de seguridad para proteger sus datos personales contra acceso no autorizado.
-                </p>
-            </div>
-        </section>
-
-        <!-- Información de Contacto (para PDF) -->
-        <section class="py-20 px-4 bg-gray-50" style="page-break-before: always;">
-            <div class="max-w-6xl mx-auto">
-                <h2 class="section-title">Información de Contacto</h2>
-                
-                <div style="background: white; padding: 2rem; border-radius: 8px; margin-top: 2rem; border-left: 4px solid var(--dorado-metalico);">
-                    <h3 style="color: var(--azul-profundo); font-weight: 700; font-size: 1.2rem; margin-bottom: 1rem;">AYGA - Asesoría y Gestión Administrativa</h3>
-                    
-                    <p style="color: #666; line-height: 1.8; margin-bottom: 1rem;">
-                        <strong style="color: var(--azul-profundo);">Responsable:</strong> Rodolfo Camarillo Garcia
-                    </p>
-                    
-                    <p style="color: #666; line-height: 1.8; margin-bottom: 1rem;">
-                        <strong style="color: var(--azul-profundo);">Domicilio:</strong> Calle Santa María 31, Cuautlancingo, Puebla
-                    </p>
-                    
-                    <p style="color: #666; line-height: 1.8; margin-bottom: 1rem;">
-                        <strong style="color: var(--azul-profundo);">Teléfono:</strong> 222 524 9941
-                    </p>
-                    
-                    <p style="color: #666; line-height: 1.8; margin-bottom: 1rem;">
-                        <strong style="color: var(--azul-profundo);">Email:</strong> ayga.contacto@gmail.com
-                    </p>
-                    
-                    <p style="color: #666; line-height: 1.8;">
-                        <strong style="color: var(--azul-profundo);">WhatsApp:</strong> +52 222 525 3621
-                    </p>
-                </div>
-
-                <div style="background: linear-gradient(135deg, rgba(197, 160, 33, 0.1) 0%, rgba(232, 213, 168, 0.05) 100%); border-left: 4px solid var(--dorado-metalico); padding: 1.5rem; border-radius: 8px; margin-top: 2rem;">
-                    <h4 style="color: var(--dorado-metalico); font-weight: 700; margin-bottom: 0.5rem;">📋 Documento Confidencial</h4>
-                    <p style="color: var(--azul-profundo); margin: 0; font-weight: 500;">
-                        Este documento contiene información confidencial y propietaria de AYGA. Está destinado exclusivamente para Jose Carrillo - Espacios Lerma SA de CV. Se prohíbe su reproducción, distribución o divulgación sin autorización expresa.
-                    </p>
-                </div>
-            </div>
-        </section>
+        </div>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>AYGA</h3>
-                    <p>
-                        Asesoría y Gestión Administrativa especializada en regularización de proyectos inmobiliarios e industriales en Puebla.
-                    </p>
-                </div>
-
-                <div class="footer-section">
-                    <h3>Contacto</h3>
-                    <p>
-                        <strong>Email:</strong> ayga.contacto@gmail.com<br>
-                        <strong>Teléfono:</strong> 222 524 9941<br>
-                        <strong>Ubicación:</strong> Cuautlancingo, Puebla
-                    </p>
-                </div>
-
-                <div class="footer-section">
-                    <h3>Legal</h3>
-                    <div class="footer-links">
-                        <a onclick="openModal('termsModal')">Términos y Condiciones</a>
-                        <a onclick="openModal('privacyModal')">Aviso de Privacidad</a>
-                    </div>
-                </div>
+    <div id="chatbot-container" class="fixed bottom-5 right-5 z- no-print">
+        <div id="chat-window" class="hidden w-80 bg-white shadow-2xl rounded-xl border border-ayga-gold flex flex-col mb-4 overflow-hidden">
+            <div class="bg-ayga-blue text-white p-4 font-bold text-sm flex justify-between items-center">
+                <span>Asistente Experto AYGA</span>
+                <button onclick="toggleChat()" class="text-ayga-gold">✕</button>
             </div>
-
-            <div class="footer-bottom">
-                <p>&copy; 2025 AYGA Asesoría y Gestión Administrativa. Todos los derechos reservados.</p>
+            <div id="chat-messages" class="h-64 p-4 overflow-y-auto text-xs space-y-3">
+                <div class="bg-gray-100 p-2 rounded">Hola Jose. Conozco los detalles de tu bodega en Sanctorum. ¿Tienes dudas sobre los tiempos de SOSAPAC o el costo de la Licencia?</div>
             </div>
+            <div class="p-3 border-t flex">
+                <input id="chat-input" type="text" placeholder="Escribe tu duda..." class="flex-1 text-xs border p-2 rounded-l outline-none">
+                <button onclick="askChat()" class="bg-ayga-gold px-3 text-white rounded-r">➜</button>
+            </div>
+        </div>
+        <button onclick="toggleChat()" class="bg-ayga-blue text-ayga-gold w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl animate-bounce glow-button">
+            💬
+        </button>
+    </div>
+
+    <footer class="bg-ayga-blue text-white py-10 no-print">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-ayga-gold font-bold mb-4">AYGA - Gestión Integral Industrial</p>
+            <div class="flex justify-center space-x-6 text-xs uppercase tracking-widest mb-6">
+                <a href="#" class="hover:text-ayga-gold">Aviso de Privacidad</a>
+                <a href="#" class="hover:text-ayga-gold">Términos y Condiciones</a>
+                <a href="https://wa.me/522225253621" class="hover:text-ayga-gold">WhatsApp Directo</a>
+            </div>
+            <p class="text-gray-500 text-[10px]">© 2026 AYGA ASESORÍA. Rodolfo Camarillo Garcia. Calle Santa Maria 31, San Juan Cuautlancingo, Pue.</p>
         </div>
     </footer>
 
-    <!-- Modales -->
-    <div id="termsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Términos y Condiciones</h2>
-                <span class="close-modal" onclick="closeModal('termsModal')">&times;</span>
-            </div>
-            <div>
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 1.5rem;">1. Esquema de Pago</h3>
-                <p>Los honorarios de AYGA se distribuyen en tres pagos:</p>
-                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                    <li><strong>30%</strong> al inicio del proyecto (firma de contrato)</li>
-                    <li><strong>40%</strong> a mitad del proyecto (completar Fase 2)</li>
-                    <li><strong>30%</strong> al cierre (obtención de Licencia de Obra Mayor)</li>
-                </ul>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 1.5rem;">2. Responsabilidad Limitada</h3>
-                <p>
-                    AYGA actúa como gestor administrativo y coordinador de proyectos. La responsabilidad técnica de cada estudio (Proyecto Ejecutivo, MIA, etc.) recae en los consultores especializados contratados. AYGA no asume responsabilidad por deficiencias en dichos estudios, pero se compromete a supervisar su calidad.
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 1.5rem;">3. Plazo de Ejecución</h3>
-                <p>
-                    El cronograma estimado es de 28 a 34 semanas. Retrasos causados por dependencias gubernamentales o cambios en requisitos municipales no serán responsabilidad de AYGA, pero se comunicarán oportunamente.
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 1.5rem;">4. Modificaciones al Proyecto</h3>
-                <p>
-                    Cambios significativos en el alcance del proyecto después de la firma del contrato podrán generar costos adicionales, que serán cotizados por separado.
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 1.5rem;">5. Confidencialidad</h3>
-                <p>
-                    Toda la información técnica y comercial del proyecto será tratada con confidencialidad absoluta.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <div id="privacyModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Aviso de Privacidad</h2>
-                <span class="close-modal" onclick="closeModal('privacyModal')">&times;</span>
-            </div>
-            <div>
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 1.5rem;">Responsable del Tratamiento de Datos</h3>
-                <p>
-                    <strong>Nombre:</strong> Rodolfo Camarillo Garcia<br>
-                    <strong>Domicilio:</strong> Calle Santa María 31, Cuautlancingo, Puebla<br>
-                    <strong>Email:</strong> ayga.contacto@gmail.com
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 1.5rem;">Datos Personales Recopilados</h3>
-                <p>
-                    Se recopilan datos como nombre, teléfono, correo electrónico y datos de la propiedad exclusivamente para la gestión del proyecto y comunicaciones relacionadas.
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 1.5rem;">Uso de Datos</h3>
-                <p>
-                    Los datos se utilizan únicamente para:
-                </p>
-                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                    <li>Gestión del proyecto de regularización</li>
-                    <li>Comunicaciones relacionadas con el servicio</li>
-                    <li>Cumplimiento de obligaciones legales</li>
-                </ul>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 1.5rem;">Derechos del Titular</h3>
-                <p>
-                    Usted tiene derecho a acceder, rectificar, cancelar u oponerme al tratamiento de sus datos personales. Para ejercer estos derechos, contacte a ayga.contacto@gmail.com.
-                </p>
-
-                <h3 style="color: var(--azul-profundo); font-weight: 700; margin-top: 1.5rem;">Seguridad</h3>
-                <p>
-                    AYGA implementa medidas de seguridad para proteger sus datos personales contra acceso no autorizado.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Chatbot Flotante -->
-    <div class="chatbot-container" id="chatbot">
-        <div class="chatbot-header">
-            <span>💬 Asistente AYGA</span>
-            <button class="chatbot-close" onclick="toggleChatbot()">✕</button>
-        </div>
-        <div class="chatbot-messages" id="chatMessages">
-            <div class="message bot">
-                <div class="message-content">
-                    Hola Jose, soy el asistente experto de AYGA. Conozco los detalles de tu bodega en Sanctorum. ¿Tienes dudas sobre los tiempos del SOSAPAC, el impacto ambiental o el DRO?
-                </div>
-            </div>
-        </div>
-        <div class="chatbot-input">
-            <input type="text" id="userInput" placeholder="Escribe tu pregunta..." onkeypress="handleChatInput(event)">
-            <button onclick="sendChatMessage()">Enviar</button>
-        </div>
-    </div>
-
     <script>
-        // Funciones del Chatbot
-        const chatbotResponses = {
-            'sosapac': 'El SOSAPAC (Sistema de Agua Potable y Alcantarillado de Cuautlancingo) requiere una factibilidad de servicios. El tiempo estimado es de 2-3 semanas. Este documento es crítico para una bodega industrial.',
-            'dro': 'El DRO (Dictamen de Riesgo Operacional) es obligatorio para obras industriales. Evalúa riesgos de operación y propone medidas de mitigación. Tiempo: 3-4 semanas.',
-            'impacto ambiental': 'La MIA (Manifestación de Impacto Ambiental) es un estudio que evalúa efectos ambientales. Para Sanctorum, incluye análisis de ruido, emisiones y gestión de residuos. Tiempo: 4-6 semanas.',
-            'tiempos': 'El proyecto completo toma 28-34 semanas. Fase 1: 4-6 semanas. Fase 2: 6-8 semanas. Fase 3: 8-10 semanas. Fase 4: 4-6 semanas.',
-            'ubicación': 'Sanctorum está en Cuautlancingo, Puebla. Esta ubicación requiere coordinación con SOSAPAC, municipio de Cuautlancingo y SEMARNAT.',
-            'precio': 'Los honorarios totales de AYGA son $235,000 MXN + IVA ($272,600 MXN). Los derechos gubernamentales estimados son ~$305,000 MXN adicionales.',
-            'default': 'Gracias por tu pregunta. Para consultas más complejas, te recomiendo hablar directamente con Rodolfo. ¿Te gustaría contactarlo por WhatsApp?'
-        };
-
-        function toggleCheck(element) {
-            const checkbox = element.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
-            element.classList.toggle('checked');
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('userInput');
-            const message = input.value.trim();
-            
-            if (message === '') return;
-
-            // Agregar mensaje del usuario
-            const messagesDiv = document.getElementById('chatMessages');
-            const userMsg = document.createElement('div');
-            userMsg.className = 'message user';
-            userMsg.innerHTML = `<div class="message-content">${escapeHtml(message)}</div>`;
-            messagesDiv.appendChild(userMsg);
-
-            // Buscar respuesta
-            let response = chatbotResponses['default'];
-            const lowerMessage = message.toLowerCase();
-            
-            for (const [key, value] of Object.entries(chatbotResponses)) {
-                if (lowerMessage.includes(key)) {
-                    response = value;
-                    break;
-                }
-            }
-
-            // Agregar respuesta del bot
-            setTimeout(() => {
-                const botMsg = document.createElement('div');
-                botMsg.className = 'message bot';
-                
-                if (response === chatbotResponses['default'] && !lowerMessage.includes('rodolfo') && !lowerMessage.includes('whatsapp')) {
-                    botMsg.innerHTML = `
-                        <div class="message-content">
-                            ${response}<br><br>
-                            <a href="https://wa.me/522225253621" target="_blank" class="whatsapp-btn">
-                                📱 Hablar con Rodolfo por WhatsApp
-                            </a>
-                        </div>
-                    `;
-                } else {
-                    botMsg.innerHTML = `<div class="message-content">${response}</div>`;
-                }
-                
-                messagesDiv.appendChild(botMsg);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            }, 500);
-
-            input.value = '';
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        function handleChatInput(event) {
-            if (event.key === 'Enter') {
-                sendChatMessage();
-            }
-        }
-
-        function toggleChatbot() {
-            const chatbot = document.getElementById('chatbot');
-            chatbot.style.display = chatbot.style.display === 'none' ? 'flex' : 'none';
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Funciones de Modales
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-
-        // Función para generar PDF
-        function generatePDF() {
-            const loader = document.getElementById('pdfLoader');
-            loader.classList.add('active');
-
-            const element = document.getElementById('pdfContent');
+        function downloadPDF() {
+            const element = document.getElementById('quotation-content');
             const opt = {
-                margin: 10,
-                filename: 'Cotizacion_AYGA_Espacios_Lerma_Sanctorum.pdf',
+                margin: 0,
+                filename: 'Cotizacion_AYGA_Lerma_Sanctorum.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },
-                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                loader.classList.remove('active');
-            }).catch(error => {
-                console.error('Error al generar PDF:', error);
-                loader.classList.remove('active');
-                alert('Hubo un error al generar el PDF. Por favor, intenta de nuevo.');
-            });
+            html2pdf().set(opt).from(element).save();
         }
 
-        // Animaciones de scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
+        function toggleChat() {
+            document.getElementById('chat-window').classList.toggle('hidden');
+        }
 
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
+        function askChat() {
+            const input = document.getElementById('chat-input');
+            const msgs = document.getElementById('chat-messages');
+            if (input.value.trim() === "") return;
 
-        document.querySelectorAll('.checklist-item, .timeline-item, .alert-box').forEach(el => {
-            el.style.opacity = '0';
-            observer.observe(el);
-        });
+            const userMsg = document.createElement('div');
+            userMsg.className = "text-right bg-blue-50 p-2 rounded italic ml-4";
+            userMsg.innerText = input.value;
+            msgs.appendChild(userMsg);
+
+            const botMsg = document.createElement('div');
+            botMsg.className = "bg-gray-100 p-2 rounded mr-4";
+            
+            // Lógica simple de respuestas basadas en investigación
+            const text = input.value.toLowerCase();
+            if (text.includes("tiempo") |
+
+| text.includes("meses")) {
+                botMsg.innerText = "La gestión integral para esta bodega de 5,315m2 toma entre 7 y 8 meses debido a los dictámenes estatales de Medio Ambiente.";
+            } else if (text.includes("sosapac") |
+
+| text.includes("agua")) {
+                botMsg.innerText = "Requerimos desarrollar la ingeniería hidráulica y de sembrado antes de solicitar la factibilidad al SOSAPAC.";
+            } else if (text.includes("derechos") |
+
+| text.includes("impuesto")) {
+                botMsg.innerText = "Los derechos municipales estimados son de $305,000 MXN, calculados sobre la Ley de Ingresos 2026 de Cuautlancingo.";
+            } else {
+                botMsg.innerHTML = "Esa es una duda técnica importante. Te conectaré directo con Rodolfo en WhatsApp para resolverla: <a href='https://wa.me/522225253621' class='text-blue-600 font-bold'>Clic aquí</a>";
+            }
+            
+            msgs.appendChild(botMsg);
+            input.value = "";
+            msgs.scrollTop = msgs.scrollHeight;
+        }
     </script>
 </body>
 </html>
